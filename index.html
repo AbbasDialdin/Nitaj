@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نِتاج v2.0 - كلية علوم الحاسوب وتكنولوجيا المعلومات</title>
+    
+    <!-- Google Fonts - Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        body {
+            background-color: #f3f4f6;
+        }
+
+        /* Custom Loader Styles */
+        #nitajLoader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #nitajLoader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-text {
+            font-size: 5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ffffff 0%, #fbbf24 50%, #ffffff 100%);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 2.5s ease-in-out infinite, fadeInUp 1s ease-out;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .loader-text {
+            animation: shimmer 2.5s ease-in-out infinite, fadeInUp 1s ease-out, pulse 2s ease-in-out infinite;
+        }
+
+        /* Sidebar Hover Effects */
+        .menu-item {
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(-5px);
+        }
+
+        .menu-item.active {
+            background-color: #10b981;
+            border-right: 4px solid #fbbf24;
+        }
+
+        /* Card Hover Effects */
+        .stat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Status Badge Styles */
+        .badge-accepted {
+            background-color: #10b981;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge-review {
+            background-color: #fbbf24;
+            color: #1e3a8a;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge-rejected {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        thead th {
+            padding: 1rem;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        tbody td {
+            padding: 1rem;
+            text-align: right;
+        }
+
+        /* Form Styles */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            transition: border-color 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .form-input:disabled {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: #10b981;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Section Transition */
+        .content-section {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1e3a8a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .login-btn-primary {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        .login-btn-primary:hover {
+            background-color: #10b981;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .login-btn-secondary {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .login-btn-secondary:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+        }
+
+        .hidden-menu-item {
+            display: none;
+        }
+
+        /* Department Card Styles */
+        .department-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+        }
+
+        .department-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .dept-ai {
+            border-color: #10b981;
+        }
+
+        .dept-cyber {
+            border-color: #ef4444;
+        }
+
+        .dept-it {
+            border-color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Nitaj Brand Loader -->
+    <div id="nitajLoader">
+        <div class="loader-text">نِتاج</div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <div class="text-center mb-8">
+                <h1 class="text-5xl font-bold mb-3" style="color: #1e3a8a;">نِتاج</h1>
+                <div class="w-20 h-1 bg-gradient-to-r from-[#fbbf24] to-[#10b981] mx-auto mb-4"></div>
+                <h2 class="text-xl font-semibold text-gray-700 leading-relaxed">
+                    كلية علوم الحاسوب<br>وتكنولوجيا المعلومات
+                </h2>
+                <p class="text-gray-500 mt-3 text-sm">نظام إدارة الأبحاث الإلكتروني v2.0</p>
+            </div>
+
+            <div class="space-y-4">
+                <button class="login-btn login-btn-primary" onclick="login('dean')">
+                    <i class="fas fa-user-tie"></i>
+                    <span>تسجيل دخول - عميد الكلية</span>
+                </button>
+                
+                <button class="login-btn login-btn-secondary" onclick="login('researcher')">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>تسجيل دخول - تدريسي</span>
+                </button>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+                <p class="text-gray-500 text-sm">
+                    <i class="fas fa-shield-alt text-[#10b981] ml-1"></i>
+                    نظام آمن ومحمي
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="flex h-screen overflow-hidden" style="display: none;">
+    
+    <!-- Sidebar -->
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#1e3a8a] text-white flex flex-col shadow-2xl">
+        <!-- Logo Section -->
+        <div class="p-6 border-b border-blue-700">
+            <h1 class="text-3xl font-bold text-center" style="color: #fbbf24;">نِتاج</h1>
+            <p class="text-sm text-center mt-2 text-blue-200">إدارة الأبحاث v2.0</p>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="flex-1 p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="menu-item active flex items-center gap-3 p-3 rounded-lg" data-section="dashboard">
+                        <i class="fas fa-home text-xl"></i>
+                        <span class="font-semibold">الرئيسية</span>
+                    </a>
+                </li>
+                <li id="departmentsMenuItem">
+                    <a href="#" class="menu-item flex items-center gap-3 p-3 rounded-lg" data-section="departments">
+                        <i class="fas fa-building text-xl"></i>
+                        <span class="font-semibold">الأقسام</span>
+                    </a>
+                </li>
+                <li id="comparisonsMenuItem">
+                    <a href="#" class="menu-item flex items-center gap-3 p-3 rounded-lg" data-section="comparisons">
+                        <i class="fas fa-chart-bar text-xl"></i>
+                        <span class="font-semibold">المقارنات</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item flex items-center gap-3 p-3 rounded-lg" data-section="researchers">
+                        <i class="fas fa-users text-xl"></i>
+                        <span class="font-semibold">الباحثين</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item flex items-center gap-3 p-3 rounded-lg" data-section="publications">
+                        <i class="fas fa-book text-xl"></i>
+                        <span class="font-semibold">سجل البحوث</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item flex items-center gap-3 p-3 rounded-lg" data-section="add-research">
+                        <i class="fas fa-plus-circle text-xl"></i>
+                        <span class="font-semibold">إضافة بحث</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Footer -->
+        <div class="p-4 border-t border-blue-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#10b981] rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-white"></i>
+                </div>
+                <div>
+                    <p class="font-semibold text-sm" id="userNameDisplay">مستخدم</p>
+                    <p class="text-xs text-blue-200" id="userRoleDisplay">دور</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-full mt-3 px-3 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-semibold transition-colors">
+                <i class="fas fa-sign-out-alt ml-2"></i>
+                تسجيل الخروج
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto">
+        
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section p-8">
+            <!-- Header -->
+            <div class="mb-8">
+                <h2 class="text-4xl font-bold text-[#1e3a8a]">لوحة التحكم</h2>
+                <p class="text-gray-600 mt-2">كلية علوم الحاسوب وتكنولوجيا المعلومات - نظرة شاملة</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Card 1 -->
+                <div class="stat-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold">إجمالي البحوث</p>
+                            <h3 class="text-3xl font-bold text-[#1e3a8a] mt-2">342</h3>
+                        </div>
+                        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-book text-[#1e3a8a] text-2xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-green-600 text-sm mt-4">
+                        <i class="fas fa-arrow-up"></i> +18% من العام الماضي
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="stat-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold">عدد التدريسيين</p>
+                            <h3 class="text-3xl font-bold text-[#1e3a8a] mt-2">45</h3>
+                        </div>
+                        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-users text-[#10b981] text-2xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-blue-600 text-sm mt-4">
+                        <i class="fas fa-info-circle"></i> عبر 3 أقسام
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="stat-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold">بحوث منشورة</p>
+                            <h3 class="text-3xl font-bold text-[#1e3a8a] mt-2">289</h3>
+                        </div>
+                        <div class="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check-circle text-[#10b981] text-2xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-green-600 text-sm mt-4">
+                        <i class="fas fa-arrow-up"></i> +22% من العام الماضي
+                    </p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="stat-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold">قيد المراجعة</p>
+                            <h3 class="text-3xl font-bold text-[#1e3a8a] mt-2">53</h3>
+                        </div>
+                        <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-clock text-[#fbbf24] text-2xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-yellow-600 text-sm mt-4">
+                        <i class="fas fa-hourglass-half"></i> في انتظار النشر
+                    </p>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Bar Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-[#1e3a8a] mb-4">البحوث حسب الأقسام</h3>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pie Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-[#1e3a8a] mb-4">توزيع نوع المنشورات</h3>
+                    <div class="chart-container">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Departments Section -->
+        <div id="departments" class="content-section p-8" style="display: none;">
+            <div class="mb-8">
+                <h2 class="text-4xl font-bold text-[#1e3a8a]">الأقسام العلمية</h2>
+                <p class="text-gray-600 mt-2">كلية علوم الحاسوب وتكنولوجيا المعلومات</p>
+            </div>
+
+            <!-- Department Cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- AI Department -->
+                <div class="department-card dept-ai">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-[#10b981] rounded-full flex items-center justify-center text-white text-2xl">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-[#1e3a8a]">الذكاء الاصطناعي</h3>
+                            <p class="text-gray-600 text-sm">Artificial Intelligence</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700 font-semibold">عدد التدريسيين</span>
+                            <span class="text-2xl font-bold text-[#10b981]">18</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700 font-semibold">البحوث المنشورة</span>
+                            <span class="text-2xl font-bold text-[#10b981]">142</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700 font-semibold">قيد المراجعة</span>
+                            <span class="text-2xl font-bold text-[#fbbf24]">23</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-star text-[#fbbf24] ml-2"></i>
+                            التخصصات: ML, Deep Learning, NLP, Computer Vision
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Cybersecurity Department -->
+                <div class="department-card dept-cyber">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-[#ef4444] rounded-full flex items-center justify-center text-white text-2xl">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-[#1e3a8a]">الأمن السيبراني</h3>
+                            <p class="text-gray-600 text-sm">Cybersecurity</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700 font-semibold">عدد التدريسيين</span>
+                            <span class="text-2xl font-bold text-[#ef4444]">14</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700 font-semibold">البحوث المنشورة</span>
+                            <span class="text-2xl font-bold text-[#ef4444]">96</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700 font-semibold">قيد المراجعة</span>
+                            <span class="text-2xl font-bold text-[#fbbf24]">18</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-star text-[#fbbf24] ml-2"></i>
+                            التخصصات: Network Security, Cryptography, Ethical Hacking
+                        </p>
+                    </div>
+                </div>
+
+                <!-- IT Department -->
+                <div class="department-card dept-it">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-[#fbbf24] rounded-full flex items-center justify-center text-white text-2xl">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-[#1e3a8a]">تكنولوجيا المعلومات</h3>
+                            <p class="text-gray-600 text-sm">Information Technology</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700 font-semibold">عدد التدريسيين</span>
+                            <span class="text-2xl font-bold text-[#fbbf24]">13</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700 font-semibold">البحوث المنشورة</span>
+                            <span class="text-2xl font-bold text-[#fbbf24]">51</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700 font-semibold">قيد المراجعة</span>
+                            <span class="text-2xl font-bold text-[#fbbf24]">12</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-star text-[#fbbf24] ml-2"></i>
+                            التخصصات: Cloud Computing, Database, Networks, Systems
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparisons Section -->
+        <div id="comparisons" class="content-section p-8" style="display: none;">
+            <div class="mb-8">
+                <h2 class="text-4xl font-bold text-[#1e3a8a]">المقارنات البحثية</h2>
+                <p class="text-gray-600 mt-2">مقارنة الإنتاج البحثي بين الأقسام العلمية</p>
+            </div>
+
+            <!-- Comparison Charts -->
+            <div class="grid grid-cols-1 gap-6">
+                <!-- Large Comparison Bar Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-[#1e3a8a] mb-4">الإنتاج البحثي السنوي حسب القسم</h3>
+                    <div style="height: 400px;">
+                        <canvas id="comparisonBarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Stats Comparison Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h4 class="text-lg font-bold text-[#10b981] mb-4">
+                            <i class="fas fa-brain ml-2"></i>
+                            الذكاء الاصطناعي
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">متوسط البحوث/تدريسي</span>
+                                <span class="font-bold text-[#10b981]">7.9</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">معدل القبول</span>
+                                <span class="font-bold text-[#10b981]">86%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">التصنيف</span>
+                                <span class="font-bold text-[#10b981]">الأول</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h4 class="text-lg font-bold text-[#ef4444] mb-4">
+                            <i class="fas fa-shield-alt ml-2"></i>
+                            الأمن السيبراني
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">متوسط البحوث/تدريسي</span>
+                                <span class="font-bold text-[#ef4444]">6.9</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">معدل القبول</span>
+                                <span class="font-bold text-[#ef4444]">84%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">التصنيف</span>
+                                <span class="font-bold text-[#ef4444]">الثاني</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h4 class="text-lg font-bold text-[#fbbf24] mb-4">
+                            <i class="fas fa-server ml-2"></i>
+                            تكنولوجيا المعلومات
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">متوسط البحوث/تدريسي</span>
+                                <span class="font-bold text-[#fbbf24]">3.9</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">معدل القبول</span>
+                                <span class="font-bold text-[#fbbf24]">81%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">التصنيف</span>
+                                <span class="font-bold text-[#fbbf24]">الثالث</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trend Line Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-[#1e3a8a] mb-4">اتجاه النمو البحثي (2020-2024)</h3>
+                    <div style="height: 350px;">
+                        <canvas id="trendLineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Researchers Section -->
+        <div id="researchers" class="content-section p-8" style="display: none;">
+            <div class="mb-8">
+                <h2 class="text-4xl font-bold text-[#1e3a8a]">التدريسيين والباحثين</h2>
+                <p class="text-gray-600 mt-2">كلية علوم الحاسوب وتكنولوجيا المعلومات</p>
+            </div>
+
+            <!-- Researchers Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Researcher Card 1 - AI -->
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-r-4 border-[#10b981]">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-[#10b981] rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                            أح
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-[#1e3a8a]">د. أحمد العلي</h4>
+                            <p class="text-gray-600 text-sm">قسم الذكاء الاصطناعي</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-700"><i class="fas fa-graduation-cap text-[#10b981] ml-2"></i> أستاذ مساعد</p>
+                        <p class="text-gray-700"><i class="fas fa-flask text-[#10b981] ml-2"></i> Machine Learning & NLP</p>
+                        <p class="text-gray-700"><i class="fas fa-book text-[#10b981] ml-2"></i> عدد البحوث: <span class="font-bold">24</span></p>
+                        <p class="text-gray-700 text-xs"><i class="fas fa-envelope text-[#10b981] ml-2"></i> ahmed.ali@uowa.edu.iq</p>
+                    </div>
+                </div>
+
+                <!-- Researcher Card 2 - Cyber -->
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-r-4 border-[#ef4444]">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-[#ef4444] rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                            سع
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-[#1e3a8a]">د. سارة عبدالله</h4>
+                            <p class="text-gray-600 text-sm">قسم الأمن السيبراني</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-700"><i class="fas fa-graduation-cap text-[#ef4444] ml-2"></i> أستاذ</p>
+                        <p class="text-gray-700"><i class="fas fa-flask text-[#ef4444] ml-2"></i> Network Security & Cryptography</p>
+                        <p class="text-gray-700"><i class="fas fa-book text-[#ef4444] ml-2"></i> عدد البحوث: <span class="font-bold">31</span></p>
+                        <p class="text-gray-700 text-xs"><i class="fas fa-envelope text-[#ef4444] ml-2"></i> sarah.abdullah@uowa.edu.iq</p>
+                    </div>
+                </div>
+
+                <!-- Researcher Card 3 - AI -->
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-r-4 border-[#10b981]">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-[#10b981] rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                            مح
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-[#1e3a8a]">د. محمد حسن</h4>
+                            <p class="text-gray-600 text-sm">قسم الذكاء الاصطناعي</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-700"><i class="fas fa-graduation-cap text-[#10b981] ml-2"></i> أستاذ مساعد</p>
+                        <p class="text-gray-700"><i class="fas fa-flask text-[#10b981] ml-2"></i> Deep Learning & Computer Vision</p>
+                        <p class="text-gray-700"><i class="fas fa-book text-[#10b981] ml-2"></i> عدد البحوث: <span class="font-bold">19</span></p>
+                        <p class="text-gray-700 text-xs"><i class="fas fa-envelope text-[#10b981] ml-2"></i> mohammed.hassan@uowa.edu.iq</p>
+                    </div>
+                </div>
+
+                <!-- Researcher Card 4 - IT -->
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-r-4 border-[#fbbf24]">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-[#fbbf24] rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                            فك
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-[#1e3a8a]">د. فاطمة كمال</h4>
+                            <p class="text-gray-600 text-sm">قسم تكنولوجيا المعلومات</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-700"><i class="fas fa-graduation-cap text-[#fbbf24] ml-2"></i> أستاذ مساعد</p>
+                        <p class="text-gray-700"><i class="fas fa-flask text-[#fbbf24] ml-2"></i> Cloud Computing & Database</p>
+                        <p class="text-gray-700"><i class="fas fa-book text-[#fbbf24] ml-2"></i> عدد البحوث: <span class="font-bold">15</span></p>
+                        <p class="text-gray-700 text-xs"><i class="fas fa-envelope text-[#fbbf24] ml-2"></i> fatima.kamal@uowa.edu.iq</p>
+                    </div>
+                </div>
+
+                <!-- Researcher Card 5 - Cyber -->
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-r-4 border-[#ef4444]">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-[#ef4444] rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                            يع
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-[#1e3a8a]">د. ياسر علي</h4>
+                            <p class="text-gray-600 text-sm">قسم الأمن السيبراني</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-700"><i class="fas fa-graduation-cap text-[#ef4444] ml-2"></i> أستاذ</p>
+                        <p class="text-gray-700"><i class="fas fa-flask text-[#ef4444] ml-2"></i> Ethical Hacking & Forensics</p>
+                        <p class="text-gray-700"><i class="fas fa-book text-[#ef4444] ml-2"></i> عدد البحوث: <span class="font-bold">27</span></p>
+                        <p class="text-gray-700 text-xs"><i class="fas fa-envelope text-[#ef4444] ml-2"></i> yasser.ali@uowa.edu.iq</p>
+                    </div>
+                </div>
+
+                <!-- Researcher Card 6 - IT -->
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-r-4 border-[#fbbf24]">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-[#fbbf24] rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                            نر
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-[#1e3a8a]">د. نور رشيد</h4>
+                            <p class="text-gray-600 text-sm">قسم تكنولوجيا المعلومات</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-700"><i class="fas fa-graduation-cap text-[#fbbf24] ml-2"></i> مدرس</p>
+                        <p class="text-gray-700"><i class="fas fa-flask text-[#fbbf24] ml-2"></i> Networks & IoT Systems</p>
+                        <p class="text-gray-700"><i class="fas fa-book text-[#fbbf24] ml-2"></i> عدد البحوث: <span class="font-bold">12</span></p>
+                        <p class="text-gray-700 text-xs"><i class="fas fa-envelope text-[#fbbf24] ml-2"></i> nour.rasheed@uowa.edu.iq</p>
+                    </div>
+                </div>
+
+                <!-- Researcher Card 7 - AI -->
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-r-4 border-[#10b981]">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-[#10b981] rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                            عم
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-[#1e3a8a]">د. علي محمود</h4>
+                            <p class="text-gray-600 text-sm">قسم الذكاء الاصطناعي</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-700"><i class="fas fa-graduation-cap text-[#10b981] ml-2"></i> أستاذ</p>
+                        <p class="text-gray-700"><i class="fas fa-flask text-[#10b981] ml-2"></i> Robotics & Reinforcement Learning</p>
+                        <p class="text-gray-700"><i class="fas fa-book text-[#10b981] ml-2"></i> عدد البحوث: <span class="font-bold">28</span></p>
+                        <p class="text-gray-700 text-xs"><i class="fas fa-envelope text-[#10b981] ml-2"></i> ali.mahmoud@uowa.edu.iq</p>
+                    </div>
+                </div>
+
+                <!-- Researcher Card 8 - Cyber -->
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-r-4 border-[#ef4444]">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-[#ef4444] rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                            رس
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-[#1e3a8a]">د. رنا سالم</h4>
+                            <p class="text-gray-600 text-sm">قسم الأمن السيبراني</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-700"><i class="fas fa-graduation-cap text-[#ef4444] ml-2"></i> مدرس</p>
+                        <p class="text-gray-700"><i class="fas fa-flask text-[#ef4444] ml-2"></i> Blockchain & Secure Systems</p>
+                        <p class="text-gray-700"><i class="fas fa-book text-[#ef4444] ml-2"></i> عدد البحوث: <span class="font-bold">16</span></p>
+                        <p class="text-gray-700 text-xs"><i class="fas fa-envelope text-[#ef4444] ml-2"></i> rana.salem@uowa.edu.iq</p>
+                    </div>
+                </div>
+
+                <!-- Researcher Card 9 - AI -->
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-r-4 border-[#10b981]">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-[#10b981] rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                            هن
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-[#1e3a8a]">د. هند ناصر</h4>
+                            <p class="text-gray-600 text-sm">قسم الذكاء الاصطناعي</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-700"><i class="fas fa-graduation-cap text-[#10b981] ml-2"></i> مدرس</p>
+                        <p class="text-gray-700"><i class="fas fa-flask text-[#10b981] ml-2"></i> AI Ethics & Explainable AI</p>
+                        <p class="text-gray-700"><i class="fas fa-book text-[#10b981] ml-2"></i> عدد البحوث: <span class="font-bold">14</span></p>
+                        <p class="text-gray-700 text-xs"><i class="fas fa-envelope text-[#10b981] ml-2"></i> hind.nasser@uowa.edu.iq</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Publications Section -->
+        <div id="publications" class="content-section p-8" style="display: none;">
+            <div class="mb-8">
+                <h2 class="text-4xl font-bold text-[#1e3a8a]">سجل البحوث المنشورة</h2>
+                <p class="text-gray-600 mt-2">قائمة شاملة بجميع البحوث - كلية علوم الحاسوب</p>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>عنوان البحث</th>
+                            <th>الباحث الرئيسي</th>
+                            <th>القسم</th>
+                            <th>المجلة</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Deep Learning for Arabic Sentiment Analysis</td>
+                            <td>د. أحمد العلي</td>
+                            <td>الذكاء الاصطناعي</td>
+                            <td>IEEE Transactions on AI</td>
+                            <td><span class="badge-accepted">مقبول</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Blockchain-Based Security Framework for IoT</td>
+                            <td>د. سارة عبدالله</td>
+                            <td>الأمن السيبراني</td>
+                            <td>Journal of Cybersecurity</td>
+                            <td><span class="badge-accepted">مقبول</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Computer Vision for Medical Image Classification</td>
+                            <td>د. محمد حسن</td>
+                            <td>الذكاء الاصطناعي</td>
+                            <td>Medical AI Journal</td>
+                            <td><span class="badge-review">قيد التدقيق</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Cloud Computing Resource Optimization</td>
+                            <td>د. فاطمة كمال</td>
+                            <td>تكنولوجيا المعلومات</td>
+                            <td>ACM Cloud Computing</td>
+                            <td><span class="badge-accepted">مقبول</span></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Advanced Penetration Testing Methodologies</td>
+                            <td>د. ياسر علي</td>
+                            <td>الأمن السيبراني</td>
+                            <td>Security & Privacy Review</td>
+                            <td><span class="badge-review">قيد التدقيق</span></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>IoT Network Performance Enhancement</td>
+                            <td>د. نور رشيد</td>
+                            <td>تكنولوجيا المعلومات</td>
+                            <td>IEEE IoT Journal</td>
+                            <td><span class="badge-accepted">مقبول</span></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Reinforcement Learning for Autonomous Systems</td>
+                            <td>د. علي محمود</td>
+                            <td>الذكاء الاصطناعي</td>
+                            <td>Robotics & AI Conference</td>
+                            <td><span class="badge-rejected">مرفوض</span></td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Quantum-Resistant Cryptography</td>
+                            <td>د. رنا سالم</td>
+                            <td>الأمن السيبراني</td>
+                            <td>Cryptography Journal</td>
+                            <td><span class="badge-review">قيد التدقيق</span></td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>Ethical AI: Bias Detection and Mitigation</td>
+                            <td>د. هند ناصر</td>
+                            <td>الذكاء الاصطناعي</td>
+                            <td>AI Ethics & Society</td>
+                            <td><span class="badge-accepted">مقبول</span></td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>5G Network Security Challenges</td>
+                            <td>د. سارة عبدالله</td>
+                            <td>الأمن السيبراني</td>
+                            <td>Communications Security</td>
+                            <td><span class="badge-accepted">مقبول</span></td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>Natural Language Processing for Arabic Texts</td>
+                            <td>د. أحمد العلي</td>
+                            <td>الذكاء الاصطناعي</td>
+                            <td>Computational Linguistics</td>
+                            <td><span class="badge-accepted">مقبول</span></td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td>Database Query Optimization Using ML</td>
+                            <td>د. فاطمة كمال</td>
+                            <td>تكنولوجيا المعلومات</td>
+                            <td>Database Systems Journal</td>
+                            <td><span class="badge-review">قيد التدقيق</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Research Section -->
+        <div id="add-research" class="content-section p-8" style="display: none;">
+            <div class="mb-8">
+                <h2 class="text-4xl font-bold text-[#1e3a8a]">إضافة بحث جديد</h2>
+                <p class="text-gray-600 mt-2">إضافة بحث إلى السجل البحثي للكلية</p>
+            </div>
+
+            <!-- Form -->
+            <div class="bg-white p-8 rounded-lg shadow-md max-w-3xl">
+                <form id="addResearchForm">
+                    <!-- DOI Input -->
+                    <div class="mb-6">
+                        <label class="block text-[#1e3a8a] font-semibold mb-2">
+                            <i class="fas fa-link ml-2"></i>
+                            رقم DOI
+                        </label>
+                        <div class="flex gap-3">
+                            <input 
+                                type="text" 
+                                id="doiInput" 
+                                class="form-input flex-1" 
+                                placeholder="10.1234/example.doi.2024"
+                            >
+                            <button type="button" id="fetchBtn" class="btn-primary">
+                                <i class="fas fa-download ml-2"></i>
+                                جلب البيانات
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="mb-6">
+                        <label class="block text-[#1e3a8a] font-semibold mb-2">
+                            <i class="fas fa-heading ml-2"></i>
+                            عنوان البحث
+                        </label>
+                        <input 
+                            type="text" 
+                            id="titleInput" 
+                            class="form-input" 
+                            placeholder="سيتم ملؤه تلقائياً"
+                            disabled
+                        >
+                    </div>
+
+                    <!-- Authors -->
+                    <div class="mb-6">
+                        <label class="block text-[#1e3a8a] font-semibold mb-2">
+                            <i class="fas fa-users ml-2"></i>
+                            المؤلفون
+                        </label>
+                        <input 
+                            type="text" 
+                            id="authorsInput" 
+                            class="form-input" 
+                            placeholder="سيتم ملؤه تلقائياً"
+                            disabled
+                        >
+                    </div>
+
+                    <!-- Department -->
+                    <div class="mb-6">
+                        <label class="block text-[#1e3a8a] font-semibold mb-2">
+                            <i class="fas fa-building ml-2"></i>
+                            القسم العلمي
+                        </label>
+                        <input 
+                            type="text" 
+                            id="departmentInput" 
+                            class="form-input" 
+                            placeholder="سيتم ملؤه تلقائياً"
+                            disabled
+                        >
+                    </div>
+
+                    <!-- Journal -->
+                    <div class="mb-6">
+                        <label class="block text-[#1e3a8a] font-semibold mb-2">
+                            <i class="fas fa-book-open ml-2"></i>
+                            المجلة
+                        </label>
+                        <input 
+                            type="text" 
+                            id="journalInput" 
+                            class="form-input" 
+                            placeholder="سيتم ملؤه تلقائياً"
+                            disabled
+                        >
+                    </div>
+
+                    <!-- Year -->
+                    <div class="mb-6">
+                        <label class="block text-[#1e3a8a] font-semibold mb-2">
+                            <i class="fas fa-calendar ml-2"></i>
+                            سنة النشر
+                        </label>
+                        <input 
+                            type="text" 
+                            id="yearInput" 
+                            class="form-input" 
+                            placeholder="سيتم ملؤه تلقائياً"
+                            disabled
+                        >
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex gap-4">
+                        <button type="submit" class="btn-primary flex-1">
+                            <i class="fas fa-save ml-2"></i>
+                            حفظ البحث
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition-colors">
+                            <i class="fas fa-times ml-2"></i>
+                            إلغاء
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+    
+    </div>
+    <!-- End Main Application -->
+
+    <script>
+        // ============================================
+        // GLOBAL VARIABLES & STATE
+        // ============================================
+        let currentUserRole = null;
+        const loader = document.getElementById('nitajLoader');
+        const loginPage = document.getElementById('loginPage');
+        const mainApp = document.getElementById('mainApp');
+        const menuItems = document.querySelectorAll('.menu-item');
+        const sections = document.querySelectorAll('.content-section');
+
+        // ============================================
+        // LOGIN FUNCTIONALITY
+        // ============================================
+        function login(role) {
+            currentUserRole = role;
+            
+            showLoader(() => {
+                // Hide login page
+                loginPage.style.display = 'none';
+                
+                // Show main application
+                mainApp.style.display = 'flex';
+                
+                // Update user display
+                const userNameDisplay = document.getElementById('userNameDisplay');
+                const userRoleDisplay = document.getElementById('userRoleDisplay');
+                
+                if (role === 'dean') {
+                    userNameDisplay.textContent = 'أ.م.د حيدر محمد علي الغانمي ';
+                    userRoleDisplay.textContent = 'عميد الكلية';
+                    // Show all menu items
+                    document.getElementById('departmentsMenuItem').style.display = 'block';
+                    document.getElementById('comparisonsMenuItem').style.display = 'block';
+                } else if (role === 'researcher') {
+                    userNameDisplay.textContent = 'د. أحمد العلي';
+                    userRoleDisplay.textContent = 'تدريسي';
+                    // Hide departments and comparisons for researchers
+                    document.getElementById('departmentsMenuItem').style.display = 'none';
+                    document.getElementById('comparisonsMenuItem').style.display = 'none';
+                }
+                
+                // Initialize charts
+                initializeCharts();
+            });
+        }
+
+        // ============================================
+        // LOGOUT FUNCTIONALITY
+        // ============================================
+        function logout() {
+            showLoader(() => {
+                // Reset to login page
+                mainApp.style.display = 'none';
+                loginPage.style.display = 'flex';
+                currentUserRole = null;
+                
+                // Reset to dashboard
+                sections.forEach(section => section.style.display = 'none');
+                document.getElementById('dashboard').style.display = 'block';
+                menuItems.forEach(item => item.classList.remove('active'));
+                menuItems[0].classList.add('active');
+            });
+        }
+
+        // ============================================
+        // LOADER FUNCTIONALITY
+        // ============================================
+        function showLoader(callback) {
+            loader.classList.remove('hidden');
+            setTimeout(() => {
+                callback();
+                loader.classList.add('hidden');
+            }, 1500);
+        }
+
+        // Hide loader on initial page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 1500);
+        });
+
+        // ============================================
+        // NAVIGATION FUNCTIONALITY
+        // ============================================
+        menuItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = item.getAttribute('data-section');
+
+                // Show loader before switching sections
+                showLoader(() => {
+                    // Update active menu item
+                    menuItems.forEach(mi => mi.classList.remove('active'));
+                    item.classList.add('active');
+
+                    // Hide all sections
+                    sections.forEach(section => {
+                        section.style.display = 'none';
+                    });
+
+                    // Show target section
+                    document.getElementById(targetSection).style.display = 'block';
+                });
+            });
+        });
+
+        // ============================================
+        // CHARTS INITIALIZATION
+        // ============================================
+        let barChart, pieChart, comparisonBarChart, trendLineChart;
+
+        function initializeCharts() {
+            // Destroy existing charts if they exist
+            if (barChart) barChart.destroy();
+            if (pieChart) pieChart.destroy();
+            if (comparisonBarChart) comparisonBarChart.destroy();
+            if (trendLineChart) trendLineChart.destroy();
+            
+            // Bar Chart - Research by Department
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['الذكاء الاصطناعي', 'الأمن السيبراني', 'تكنولوجيا المعلومات'],
+                    datasets: [{
+                        label: 'عدد البحوث المنشورة',
+                        data: [142, 96, 51],
+                        backgroundColor: ['#10b981', '#ef4444', '#fbbf24'],
+                        borderColor: ['#059669', '#dc2626', '#f59e0b'],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                font: {
+                                    family: 'Cairo',
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    family: 'Cairo'
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    family: 'Cairo'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Pie Chart - Publication Types
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            pieChart = new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['مجلات عالمية محكمة', 'مجلات محلية', 'مؤتمرات دولية', 'مؤتمرات محلية'],
+                    datasets: [{
+                        label: 'توزيع البحوث',
+                        data: [178, 52, 87, 25],
+                        backgroundColor: [
+                            '#10b981',
+                            '#1e3a8a',
+                            '#fbbf24',
+                            '#ef4444'
+                        ],
+                        borderWidth: 3,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Cairo',
+                                    size: 12
+                                },
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Comparison Bar Chart
+            const compBarCtx = document.getElementById('comparisonBarChart').getContext('2d');
+            comparisonBarChart = new Chart(compBarCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024'],
+                    datasets: [
+                        {
+                            label: 'الذكاء الاصطناعي',
+                            data: [18, 24, 28, 32, 40],
+                            backgroundColor: '#10b981',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'الأمن السيبراني',
+                            data: [12, 16, 18, 22, 28],
+                            backgroundColor: '#ef4444',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'تكنولوجيا المعلومات',
+                            data: [8, 9, 10, 11, 13],
+                            backgroundColor: '#fbbf24',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    family: 'Cairo',
+                                    size: 13
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    family: 'Cairo'
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    family: 'Cairo'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Trend Line Chart
+            const trendCtx = document.getElementById('trendLineChart').getContext('2d');
+            trendLineChart = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024'],
+                    datasets: [
+                        {
+                            label: 'الذكاء الاصطناعي',
+                            data: [18, 24, 28, 32, 40],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'الأمن السيبراني',
+                            data: [12, 16, 18, 22, 28],
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'تكنولوجيا المعلومات',
+                            data: [8, 9, 10, 11, 13],
+                            borderColor: '#fbbf24',
+                            backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    family: 'Cairo',
+                                    size: 13
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    family: 'Cairo'
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    family: 'Cairo'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // FETCH DOI DATA FUNCTIONALITY
+        // ============================================
+        const fetchBtn = document.getElementById('fetchBtn');
+        const doiInput = document.getElementById('doiInput');
+        const titleInput = document.getElementById('titleInput');
+        const authorsInput = document.getElementById('authorsInput');
+        const departmentInput = document.getElementById('departmentInput');
+        const journalInput = document.getElementById('journalInput');
+        const yearInput = document.getElementById('yearInput');
+
+        fetchBtn.addEventListener('click', () => {
+            const doi = doiInput.value.trim();
+            
+            if (!doi) {
+                alert('الرجاء إدخال رقم DOI');
+                return;
+            }
+
+            // Show loader and simulate API call
+            showLoader(() => {
+                // Mock data (simulating fetched data)
+                titleInput.value = 'Deep Reinforcement Learning for Autonomous Decision Making';
+                authorsInput.value = 'د. أحمد العلي، د. محمد حسن، د. علي محمود';
+                departmentInput.value = 'قسم الذكاء الاصطناعي';
+                journalInput.value = 'IEEE Transactions on Neural Networks and Learning Systems';
+                yearInput.value = '2024';
+
+                // Enable inputs
+                titleInput.disabled = false;
+                authorsInput.disabled = false;
+                departmentInput.disabled = false;
+                journalInput.disabled = false;
+                yearInput.disabled = false;
+            });
+        });
+
+        // ============================================
+        // FORM SUBMISSION
+        // ============================================
+        const addResearchForm = document.getElementById('addResearchForm');
+        
+        addResearchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            showLoader(() => {
+                alert('تم حفظ البحث بنجاح في سجل الكلية!');
+                addResearchForm.reset();
+                
+                // Disable inputs again
+                titleInput.disabled = true;
+                authorsInput.disabled = true;
+                departmentInput.disabled = true;
+                journalInput.disabled = true;
+                yearInput.disabled = true;
+            });
+        });
+
+        addResearchForm.addEventListener('reset', () => {
+            titleInput.disabled = true;
+            authorsInput.disabled = true;
+            departmentInput.disabled = true;
+            journalInput.disabled = true;
+            yearInput.disabled = true;
+        });
+    </script>
+</body>
+</html>
